@@ -1,1 +1,1 @@
-module github.com/TheCrealm/rudder-go-client
+module github.com/thecrealm/rudder-go-client
