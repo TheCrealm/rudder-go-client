@@ -59,6 +59,9 @@ func (client *RudderClient) NewRequest(method, path string, body io.Reader) (*ht
 	//Add Rudder API token to authenticate this request
 	request.Header.Add("X-API-Token", client.apiToken)
 
+	//Set api version level to 10 which required >= Rudder v4.2
+	request.Header.Add("X-API-Version", "10")
+
 	return request, nil
 }
 
