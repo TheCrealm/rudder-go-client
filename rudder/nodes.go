@@ -23,8 +23,6 @@ func (client *NodesClient) ListAcceptedNodes() (*Nodes, error) {
 		return nil, err
 	}
 
-	fmt.Println(request.URL)
-
 	response, err := client.client.Call(request)
 	if err != nil {
 		return nil, err
