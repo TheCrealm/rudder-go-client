@@ -36,7 +36,14 @@ type ClientOption func(client *RudderClient)
 
 func AllowInsecureCertificates() ClientOption {
 	return func(client *RudderClient) {
-		client.client.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+			},
+		}
+
+		client.client.Transport = transport
 	}
 }
 
