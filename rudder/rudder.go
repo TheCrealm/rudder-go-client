@@ -20,7 +20,7 @@ func NewClient(Endpoint, ApiToken string, Options ...ClientOption) *RudderClient
 	client := &RudderClient{
 		endpoint: Endpoint,
 		apiToken: ApiToken,
-		client:   &http.Client{},
+		client:   http.DefaultClient,
 	}
 
 	for _, option := range Options {
