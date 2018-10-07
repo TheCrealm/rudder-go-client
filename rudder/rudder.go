@@ -11,13 +11,19 @@ type RudderClient struct {
 	endpoint string
 	apiToken string
 	client   *http.Client
+
+	Nodes NodesClient
 }
 
 func NewClient(Endpoint, ApiToken string) *RudderClient {
-	return &RudderClient{
+	client := &RudderClient{
 		endpoint: Endpoint,
 		apiToken: ApiToken,
 	}
+
+	client.Nodes = NodesClient{client: client}
+
+	return client
 }
 
 func (client *RudderClient) NewRequest(method, path string, body io.Reader) (*http.Request, error) {
