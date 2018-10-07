@@ -1,6 +1,7 @@
 package rudder
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"io"
 	"io/ioutil"
@@ -15,16 +16,28 @@ type RudderClient struct {
 	Nodes NodesClient
 }
 
-func NewClient(Endpoint, ApiToken string) *RudderClient {
+func NewClient(Endpoint, ApiToken string, Options ...ClientOption) *RudderClient {
 	client := &RudderClient{
 		endpoint: Endpoint,
 		apiToken: ApiToken,
 		client:   &http.Client{},
 	}
 
+	for _, option := range Options {
+		option(client)
+	}
+
 	client.Nodes = NodesClient{client: client}
 
 	return client
+}
+
+type ClientOption func(client *RudderClient)
+
+func AllowInsecureCertificates() ClientOption {
+	return func(client *RudderClient) {
+		client.client.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
 }
 
 func (client *RudderClient) NewRequest(method, path string, body io.Reader) (*http.Request, error) {
