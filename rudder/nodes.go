@@ -1,5 +1,7 @@
 package rudder
 
+import "fmt"
+
 type NodesClient struct {
 	client *RudderClient
 }
@@ -15,10 +17,13 @@ type Node struct {
 //https://docs.rudder.io/api/#api-Nodes-listAcceptedNodes
 func (client *NodesClient) ListAcceptedNodes() (*Nodes, error) {
 
-	request, err := client.client.NewRequest("GET", "/api/nodes", nil)
+	query := `?where=[{"objectType":"node","attribute":"OS","comparator":"eq","value":"Linux"}]`
+	request, err := client.client.NewRequest("GET", fmt.Sprint("/api/nodes", query), nil)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println(request.URL)
 
 	response, err := client.client.Call(request)
 	if err != nil {
