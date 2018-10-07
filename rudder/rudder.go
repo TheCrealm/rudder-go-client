@@ -19,6 +19,7 @@ func NewClient(Endpoint, ApiToken string) *RudderClient {
 	client := &RudderClient{
 		endpoint: Endpoint,
 		apiToken: ApiToken,
+		client:   &http.Client{},
 	}
 
 	client.Nodes = NodesClient{client: client}
