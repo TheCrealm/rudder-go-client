@@ -47,6 +47,22 @@ func AllowInsecureCertificates() ClientOption {
 	}
 }
 
+func (client *RudderClient) Execute(method, path string, body io.Reader, respData interface{}) (*Response, error) {
+
+	request, err := client.NewRequest(method, path, body)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := client.Call(request)
+	if err != nil {
+		return response, err
+	}
+
+	response.UnmarschalData(respData)
+	return response, nil
+}
+
 func (client *RudderClient) NewRequest(method, path string, body io.Reader) (*http.Request, error) {
 
 	target := client.endpoint + path

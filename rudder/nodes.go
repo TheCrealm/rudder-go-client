@@ -1,6 +1,9 @@
 package rudder
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type NodesClient struct {
 	client *RudderClient
@@ -11,26 +14,90 @@ type Nodes struct {
 }
 
 type Node struct {
-	Hostname string `json:"hostname"`
+	Id                          string          `json:"id"`
+	Hostname                    string          `json:"hostname"`
+	Status                      NodeStatus      `json:"status"`
+	ArchitectureDescription     string          `json:"architectureDescription"`
+	Description                 string          `json:"description"`
+	IpAddresses                 json.RawMessage `json:"ipAddresses"`
+	LastInventoryDate           string          `json:"lastInventoryDate"`
+	Machine                     json.RawMessage `json:"machine"`
+	Os                          json.RawMessage `json:"os"`
+	ManagementTechnology        json.RawMessage `json:"managementTechnology"`
+	PolicyServerId              string          `json:"policyServerId"`
+	Properties                  json.RawMessage `json:"properties"`
+	PolicyMode                  string          `json:"policyMode"`
+	Ram                         string          `json:"ram"`
+	Timezone                    json.RawMessage `json:"timezone"`
+	Accounts                    json.RawMessage `json:"accounts"`
+	Bios                        json.RawMessage `json:"bios"`
+	Controllers                 json.RawMessage `json:"controllers"`
+	EnvironmentVariables        json.RawMessage `json:"environmentVariables"`
+	FileSystems                 json.RawMessage `json:"fileSystems"`
+	ManagementTechnologyDetails string          `json:"managementTechnologyDetails"`
+	Memories                    json.RawMessage `json:"memories"`
+	NetworkInterfaces           json.RawMessage `json:"networkInterfaces"`
+	Ports                       json.RawMessage `json:"ports"`
+	Processes                   json.RawMessage `json:"processes"`
+	Processors                  json.RawMessage `json:"processors"`
+	Slots                       json.RawMessage `json:"slots"`
+	Software                    json.RawMessage `json:"software"`
+	Sound                       json.RawMessage `json:"sound"`
+	Storage                     json.RawMessage `json:"storage"`
+	Videos                      json.RawMessage `json:"videos"`
+	VirtualMachines             json.RawMessage `json:"virtualMachines"`
+}
+
+type NodeStatus string
+
+var (
+	Pending  NodeStatus = "pending"
+	Accepted NodeStatus = "accepted"
+	Deleted  NodeStatus = "deleted"
+)
+
+type QueryWhere struct {
+	ObjectType string `json:"objectType"`
+	Attribute  string `json:"attribute"`
+	Comperator string `json:"comperator"`
+	Value      string `json:"value"`
 }
 
 //https://docs.rudder.io/api/#api-Nodes-listAcceptedNodes
 func (client *NodesClient) ListAcceptedNodes() (*Nodes, error) {
 
-	query := `?where=[{"objectType":"node","attribute":"OS","comparator":"eq","value":"Linux"}]`
-	request, err := client.client.NewRequest("GET", fmt.Sprint("/api/nodes", query), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := client.client.Call(request)
-	if err != nil {
-		return nil, err
-	}
-
-	//get data
 	data := &Nodes{}
-	response.UnmarschalData(data)
+
+	qwhere := &QueryWhere{
+		ObjectType: "node",
+		Attribute:  "OS",
+		Comperator: "eq",
+		Value:      "Linux",
+	}
+
+	_, err := json.Marshal(qwhere)
+	if err != nil {
+		return nil, err
+	}
+
+	//TODO: Generate Node Query - this query is just for testing purposes here
+	query := `?where=[{"objectType":"node","attribute":"OS","comparator":"eq","value":"Linux"}]`
+
+	_, err = client.client.Execute("GET", fmt.Sprint("/api/nodes", query), nil, data)
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
+}
+
+func (client *NodesClient) ListPendingNodes() (*Nodes, error) {
+
+	data := &Nodes{}
+	_, err := client.client.Execute("GET", "/api/nodes/pending", nil, data)
+	if err != nil {
+		return nil, err
+	}
 
 	return data, nil
 }
