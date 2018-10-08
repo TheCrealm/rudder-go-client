@@ -59,7 +59,11 @@ func (client *RudderClient) Execute(method, path string, body io.Reader, respDat
 		return response, err
 	}
 
-	response.UnmarschalData(respData)
+	err = response.UnmarschalData(respData)
+	if err != nil {
+		return response, err
+	}
+
 	return response, nil
 }
 

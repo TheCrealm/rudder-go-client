@@ -11,6 +11,6 @@ type Response struct {
 	ErrorDetails string          `json:"errorDetails"`
 }
 
-func (resp *Response) UnmarschalData(v interface{}) {
-	json.Unmarshal([]byte(resp.Data), v)
+func (resp *Response) UnmarschalData(v interface{}) error {
+	return json.Unmarshal([]byte(resp.Data), v)
 }

@@ -19,22 +19,22 @@ type Node struct {
 	Status                      NodeStatus      `json:"status"`
 	ArchitectureDescription     string          `json:"architectureDescription"`
 	Description                 string          `json:"description"`
-	IpAddresses                 json.RawMessage `json:"ipAddresses"`
+	IpAddresses                 []string        `json:"ipAddresses"`
 	LastInventoryDate           string          `json:"lastInventoryDate"`
-	Machine                     json.RawMessage `json:"machine"`
+	Machine                     Machine         `json:"machine"`
 	Os                          json.RawMessage `json:"os"`
 	ManagementTechnology        json.RawMessage `json:"managementTechnology"`
 	PolicyServerId              string          `json:"policyServerId"`
 	Properties                  json.RawMessage `json:"properties"`
 	PolicyMode                  string          `json:"policyMode"`
-	Ram                         string          `json:"ram"`
+	Ram                         int             `json:"ram"`
 	Timezone                    json.RawMessage `json:"timezone"`
 	Accounts                    json.RawMessage `json:"accounts"`
 	Bios                        json.RawMessage `json:"bios"`
 	Controllers                 json.RawMessage `json:"controllers"`
 	EnvironmentVariables        json.RawMessage `json:"environmentVariables"`
 	FileSystems                 json.RawMessage `json:"fileSystems"`
-	ManagementTechnologyDetails string          `json:"managementTechnologyDetails"`
+	ManagementTechnologyDetails json.RawMessage `json:"managementTechnologyDetails"`
 	Memories                    json.RawMessage `json:"memories"`
 	NetworkInterfaces           json.RawMessage `json:"networkInterfaces"`
 	Ports                       json.RawMessage `json:"ports"`
@@ -55,6 +55,14 @@ var (
 	Accepted NodeStatus = "accepted"
 	Deleted  NodeStatus = "deleted"
 )
+
+type Machine struct {
+	Id           string `json:"id"`
+	Type         string `json:"type"`
+	Provider     string `json:"provider"`
+	Manufacturer string `json:"manufacturer"`
+	SerialNumber string `json:"serialNumber"`
+}
 
 type QueryWhere struct {
 	ObjectType string `json:"objectType"`
@@ -81,7 +89,7 @@ func (client *NodesClient) ListAcceptedNodes() (*Nodes, error) {
 	}
 
 	//TODO: Generate Node Query - this query is just for testing purposes here
-	query := `?where=[{"objectType":"node","attribute":"OS","comparator":"eq","value":"Linux"}]`
+	query := `?include=full&where=[{"objectType":"node","attribute":"OS","comparator":"eq","value":"Linux"}]`
 
 	_, err = client.client.Execute("GET", fmt.Sprint("/api/nodes", query), nil, data)
 	if err != nil {
